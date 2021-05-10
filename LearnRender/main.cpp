@@ -65,12 +65,13 @@ int main(void)
 			ImGuiWindowFlags_NoTitleBar |
 			ImGuiWindowFlags_NoMove |
 			ImGuiWindowFlags_NoBringToFrontOnFocus |
-			ImGuiWindowFlags_NoFocusOnAppearing))
+			ImGuiWindowFlags_NoFocusOnAppearing |
+			ImGuiWindowFlags_NoBackground))
 		{
 			if (ImGui::Begin("Circle params"))
 			{
 				float v[2] = { center.x, center.y };
-				ImGui::InputFloat2("Center", v);
+				ImGui::SliderFloat2("Center", v, 0.f, 1280.f);
 				center.x = v[0];
 				center.y = v[1];
 			}
