@@ -39,6 +39,11 @@ int main(void)
 
 	bool show_demo_window = true;
 
+	// circle params
+	ImVec2 center = ImVec2(10.f, 10.f);
+	ImColor color = ImColor(255, 255, 0);
+	float radius = 10.f;
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
@@ -52,6 +57,32 @@ int main(void)
 
 		if (show_demo_window)
 			ImGui::ShowDemoWindow(&show_demo_window);
+
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+		
+		if (ImGui::Begin(
+			"Viewport", nullptr,
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_NoBringToFrontOnFocus |
+			ImGuiWindowFlags_NoFocusOnAppearing))
+		{
+			if (ImGui::Begin("Circle params"))
+			{
+				float v[2] = { center.x, center.y };
+				ImGui::InputFloat2("Center", v);
+				center.x = v[0];
+				center.y = v[1];
+			}
+			ImGui::End();
+
+			ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+			
+			
+			drawList->AddCircleFilled(center, radius, color);
+		}
+		ImGui::End();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
