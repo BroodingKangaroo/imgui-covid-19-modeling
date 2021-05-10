@@ -37,7 +37,7 @@ int main(void)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
-	bool show_demo_window = true;
+	bool show_demo_window = false;
 
 	// circle params
 	ImVec2 center = ImVec2(10.f, 10.f);
