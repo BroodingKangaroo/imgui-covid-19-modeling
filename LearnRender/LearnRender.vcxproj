@@ -15,6 +15,7 @@
     <ProjectGuid>{3E10199C-52BC-423A-8EBA-65EEC6129DD0}</ProjectGuid>
     <RootNamespace>LearnRender</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>covid-19-modeling</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -98,6 +99,11 @@
     <ClCompile Include="vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cage.h" />
+    <ClInclude Include="circle.h" />
+    <ClInclude Include="random_generators.h" />
+    <ClInclude Include="settings.h" />
+    <ClInclude Include="util.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
     <ClInclude Include="vendor\imgui\imgui_impl_glfw.h" />
