@@ -13,6 +13,6 @@ ImColor RECOVERED_COLOR = ImColor(0, 255, 0);
 
 int CIRCLE_COUNT = 100;
 
-float RECOVERY_TIME = 20;
+float RECOVERY_TIME = 100;
 
-bool SHOW_DEMO_WINDOW = false;
+bool SHOW_DEMO_WINDOW = true;

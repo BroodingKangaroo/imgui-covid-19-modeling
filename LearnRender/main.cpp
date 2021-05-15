@@ -17,12 +17,19 @@ int main(void)
 	GLFWwindow* window = create_window("COVID-19 modeling");
 	if(!window)	return -1;
 
-	Cage cage(1000, VIEWPORT_HEIGHT, VIEWPORT_WIDTH, glm::vec2(0,0));
+	Cage cage(300, 500, 500, glm::vec2(50,50));
 	cage.populate();
-	cage.populate_infected(1);
+	cage.populateInfected(1);
 	/* Loop until the user closes the window */
+
+	float current_time = glfwGetTime();
+	float scaled_current_time = current_time;
 	while (!glfwWindowShouldClose(window))
 	{
+
+		scaled_current_time += (glfwGetTime() - current_time) * SIMULATION_SPEED;
+		current_time = glfwGetTime();
+		
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -51,7 +58,7 @@ int main(void)
 		{
 			ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-			cage.update(glfwGetTime());
+			cage.update(scaled_current_time);
 			
 			for (const auto& circle: cage.getCircles())
 			{

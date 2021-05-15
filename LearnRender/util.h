@@ -39,3 +39,7 @@ GLFWwindow* create_window(const char * title) {
 
 	return window;
 }
+
+void invertVector2(glm::vec2& v) {
+	v *= -1.f;
+}
