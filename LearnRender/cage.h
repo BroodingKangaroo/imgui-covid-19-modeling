@@ -1,8 +1,11 @@
 #pragma once
+#include <random>
 #include <stdexcept>
 #include <vector>
 
 #include "circle.h"
+#include "util.h"
+#include "random_generators.h"
 
 class Cage {
 	std::vector<Circle> circles;
@@ -24,10 +27,9 @@ public:
 		std::uniform_int_distribution<int> width_distribution_(begin_.x, width_);
 		std::uniform_int_distribution<int> height_distribution_(begin_.y, height_);
 		Circle circle;
-		for (int i = 0; i < population_size_; i++) 	{
-			circle.direction.x = direction_distribution(generator);
-			circle.direction.y = direction_distribution(generator);
-
+		for (int i = 0; i < population_size_; i++) {
+			circle.direction.x = x_direction_distribution(generator);
+			circle.direction.y = y_direction_distribution(generator);
 			circle.center.x = width_distribution_(generator);
 			circle.center.y = height_distribution_(generator);
 			circles.push_back(circle);
@@ -38,7 +40,7 @@ public:
 		if (number > population_size_ || number <= 0) {
 			throw std::out_of_range("Number of infected to populate is invalid");
 		}
-		while(number--) {
+		while (number--) {
 			circles[number].disease_stage = DiseaseStages::INFECTED;
 		}
 	}
@@ -52,7 +54,7 @@ public:
 
 		last_update_time_ = current_time;
 	}
-	
+
 	std::vector<Circle> getCircles() const {
 		return circles;
 	}
@@ -75,19 +77,25 @@ public:
 			glm::vec2 oldCenter = circle.center;
 			glm::vec2 newCenter = circle.center + circle.direction * delta_time;
 			circle.center = newCenter;
-			if (outsideViewport_(circle)) {
+			glm::vec2* intersection = outsideViewport_(circle);
+			if (intersection) {
 				circle.center = oldCenter;
-				invertVector2(circle.direction);
+				invertVector2(circle.direction, *intersection);
 			}
 			circle.center += circle.direction * delta_time;
 		}
 	}
 
-	bool outsideViewport_(const Circle& c) {
-		return c.center.x + c.radius > begin_.x + width_ ||
-			c.center.y + c.radius > begin_.y + height_ ||
-			c.center.x - c.radius < begin_.x ||
-			c.center.y - c.radius < begin_.y;
+	glm::vec2* outsideViewport_(const Circle& c) {
+		if (c.center.x + c.radius > begin_.x + width_)
+			return Intersection::RIGHT;
+		if (c.center.y + c.radius > begin_.y + height_)
+			return Intersection::TOP;
+		if (c.center.x - c.radius < begin_.x)
+			return Intersection::LEFT;
+		if (c.center.y - c.radius < begin_.y)
+			return Intersection::BOTTOM;
+		return Intersection::NO_INTERSECTION;
 	}
 
 	void changeDiseaseStageOverTime_(const float& current_time) {

@@ -1,10 +1,7 @@
 #pragma once
-#include <vector>
 #include <glm/vec2.hpp>
 
-#include "random_generators.h"
 #include "settings.h"
-#include "util.h"
 
 enum class DiseaseStages {
 	SUSCEPTIBLE, INFECTED, RECOVERED, DEAD
