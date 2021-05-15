@@ -15,12 +15,17 @@ class Cage {
 	glm::vec2 begin_{};
 	float last_update_time_;
 public:
+	int susceptible;
+	int infected;
+	int recovered;
+	int dead;
 	Cage(int population_size, int height, int width, glm::vec2 center) :
 		population_size_(population_size),
 		height_(height),
 		width_(width),
 		begin_(center),
-		last_update_time_(0) {}
+		last_update_time_(0),
+		susceptible(population_size) {}
 
 	void populate() {
 		circles.reserve(population_size_);
@@ -36,13 +41,15 @@ public:
 		}
 	}
 
-	void populateInfected(int number) {
-		if (number > population_size_ || number <= 0) {
+	void populateInfected(int number_of_infected_to_populate) {
+		if (number_of_infected_to_populate > population_size_ || number_of_infected_to_populate <= 0) {
 			throw std::out_of_range("Number of infected to populate is invalid");
 		}
-		while (number--) {
-			circles[number].disease_stage = DiseaseStages::INFECTED;
+		while (number_of_infected_to_populate--) {
+			circles[number_of_infected_to_populate].disease_stage = DiseaseStages::INFECTED;
 		}
+		infected = number_of_infected_to_populate;
+		susceptible -= number_of_infected_to_populate;
 	}
 
 	void update(const float current_time) {
@@ -66,6 +73,8 @@ public:
 					if (circle.disease_stage == DiseaseStages::SUSCEPTIBLE && intersect(covidCircle, circle)) {
 						circle.disease_stage = DiseaseStages::INFECTED;
 						circle.disease_stage_change_time = current_time;
+						susceptible--;
+						infected++;
 					}
 				}
 			}
@@ -102,10 +111,14 @@ public:
 		for (auto& circle : circles) {
 			float dTime = current_time - circle.disease_stage_change_time;
 			if (circle.disease_stage == DiseaseStages::INFECTED && dTime >= RECOVERY_TIME) {
-				if (death_distribution(generator) == 1)
+				if (death_distribution(generator) == 1) {
 					circle.disease_stage = DiseaseStages::DEAD;
-				else
+					dead++;
+				} else {
 					circle.disease_stage = DiseaseStages::RECOVERED;
+					recovered++;
+				}
+				infected--;
 			}
 		}
 	}

@@ -59,7 +59,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)vendor\GLFW\include\;$(SolutionDir)vendor\glad\include\;$(SolutionDir)vendor\glm\include\;$(ProjectDir)vendor\imgui\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)vendor\GLFW\include\;$(SolutionDir)vendor\glad\include\;$(SolutionDir)vendor\glm\include\;$(ProjectDir)vendor\imgui\;$(ProjectDir)vendor\implot\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)vendor\GLFW\include\;$(SolutionDir)vendor\glad\include\;$(SolutionDir)vendor\glm\include\;$(ProjectDir)vendor\imgui\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)vendor\GLFW\include\;$(SolutionDir)vendor\glad\include\;$(SolutionDir)vendor\glm\include\;$(ProjectDir)vendor\imgui\;$(ProjectDir)vendor\implot\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -97,6 +97,9 @@
     <ClCompile Include="vendor\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="vendor\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="vendor\implot\implot.cpp" />
+    <ClCompile Include="vendor\implot\implot_demo.cpp" />
+    <ClCompile Include="vendor\implot\implot_items.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cage.h" />
@@ -112,6 +115,8 @@
     <ClInclude Include="vendor\imgui\imstb_rectpack.h" />
     <ClInclude Include="vendor\imgui\imstb_textedit.h" />
     <ClInclude Include="vendor\imgui\imstb_truetype.h" />
+    <ClInclude Include="vendor\implot\implot.h" />
+    <ClInclude Include="vendor\implot\implot_internal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
