@@ -15,4 +15,6 @@ int CIRCLE_COUNT = 100;
 
 float RECOVERY_TIME = 100;
 
+float DEATH_PROBABILITY = 0.3;
+
 bool SHOW_DEMO_WINDOW = true;

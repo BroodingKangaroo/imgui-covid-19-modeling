@@ -83,6 +83,7 @@ public:
 
 	void moveCircles_(const float& delta_time) {
 		for (auto& circle : circles) {
+			if (circle.disease_stage == DiseaseStages::DEAD) continue;
 			glm::vec2 oldCenter = circle.center;
 			glm::vec2 newCenter = circle.center + circle.direction * delta_time;
 			circle.center = newCenter;
@@ -111,7 +112,7 @@ public:
 		for (auto& circle : circles) {
 			float dTime = current_time - circle.disease_stage_change_time;
 			if (circle.disease_stage == DiseaseStages::INFECTED && dTime >= RECOVERY_TIME) {
-				if (death_distribution(generator) == 1) {
+				if (death_distribution(generator) < DEATH_PROBABILITY) {
 					circle.disease_stage = DiseaseStages::DEAD;
 					dead++;
 				} else {
