@@ -13,7 +13,7 @@ class Cage {
 	int height_{};
 	int width_{};
 	glm::vec2 begin_{};
-	float last_update_time_;
+	float last_update_time_{};
 public:
 	int susceptible;
 	int infected;
@@ -89,7 +89,7 @@ public:
 			glm::vec2* intersection = outsideViewport_(circle);
 			if (intersection) {
 				circle.center = oldCenter;
-				invertVector2(circle.direction, *intersection);
+				reflectVector2(circle.direction, *intersection);
 			}
 			circle.center += circle.direction * delta_time;
 		}

@@ -25,19 +25,21 @@ int main(void) {
 
 	float current_time = glfwGetTime();
 	float scaled_current_time = current_time;
-	while (!glfwWindowShouldClose(window)) 	{
+	while (!glfwWindowShouldClose(window)) {
 		scaled_current_time += (glfwGetTime() - current_time) * SIMULATION_SPEED;
 		current_time = glfwGetTime();
 
+		glClearColor(.5f, .5f, .5f, .5f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glClearColor(0.0, 0.0, 0.0, 0.0);
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		if (SHOW_DEMO_WINDOW)
+		if (SHOW_DEMO_WINDOW) {
+			ImPlot::ShowDemoWindow();
 			ImGui::ShowDemoWindow(&SHOW_DEMO_WINDOW);
+		}
 
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
@@ -46,7 +48,6 @@ int main(void) {
 
 		}
 		ImGui::End();
-		ImPlot::ShowDemoWindow();
 		ImGui::Begin("My Window");
 		static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit;
 		static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit;
@@ -65,7 +66,7 @@ int main(void) {
 			ImGuiWindowFlags_NoTitleBar |
 			ImGuiWindowFlags_NoMove |
 			ImGuiWindowFlags_NoBringToFrontOnFocus |
-			ImGuiWindowFlags_NoFocusOnAppearing)) 		{
+			ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBackground)) {
 			ImDrawList* drawList = ImGui::GetWindowDrawList();
 
 			cage.update(scaled_current_time);
@@ -74,7 +75,7 @@ int main(void) {
 			recovered.push_back(cage.recovered);
 			dead.push_back(cage.dead);
 
-			for (const auto& circle : cage.getCircles()) 			{
+			for (const auto& circle : cage.getCircles()) {
 				ImVec2 center = ImVec2(circle.center.x, circle.center.y);
 				ImColor color = switchColorByDiseaseStage(circle.disease_stage);
 				drawList->AddCircleFilled(center, circle.radius, color);
@@ -96,7 +97,8 @@ int main(void) {
 	ImGui_ImplGlfw_Shutdown();
 	ImPlot::DestroyContext();
 	ImGui::DestroyContext();
-
+	
+	glfwDestroyWindow(window);
 	glfwTerminate();
 	return 0;
 }

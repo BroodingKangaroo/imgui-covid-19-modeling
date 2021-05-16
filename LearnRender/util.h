@@ -26,20 +26,29 @@ GLFWwindow* create_window(const char* title) {
 	GLFWwindow* window;
 
 	/* Initialize the library */
-	if (!glfwInit())
+	if (!glfwInit()) {
+		puts("Could not initialize GLFW");
 		return nullptr;
+	}
 
+	//glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
+	
 	/* Create a windowed mode window and its OpenGL context */
 	window = glfwCreateWindow(VIEWPORT_WIDTH, VIEWPORT_HEIGHT, title, NULL, NULL);
 	if (!window) {
 		glfwTerminate();
+		puts("Could not create GLFW window");
 		return nullptr;
 	}
 
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
+	glfwSwapInterval(1);
 
-	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		puts("Could not initialize Glad");
+		return nullptr;
+	}
 
 	// imgui stuff
 	IMGUI_CHECKVERSION();
@@ -57,6 +66,6 @@ GLFWwindow* create_window(const char* title) {
 	return window;
 }
 
-void invertVector2(glm::vec2& v, glm::vec2 intersection) {
-	v *= intersection;
+void reflectVector2(glm::vec2& v, glm::vec2 reflection) {
+	v *= reflection;
 }
