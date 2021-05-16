@@ -9,11 +9,12 @@
 #include "settings.h"
 #include "util.h"
 
-
-std::vector<int>susceptible;
-std::vector<int>infected;
-std::vector<int>recovered;
-std::vector<int>dead;
+bool continue_drawing = true;
+std::vector<float>susceptible;
+std::vector<float>infected;
+std::vector<float>recovered;
+std::vector<float>dead;
+std::vector<float>time;
 
 int main(void) {
 	GLFWwindow* window = create_window("COVID-19 modeling");
@@ -21,7 +22,7 @@ int main(void) {
 
 	Cage cage(300, 500, 500, glm::vec2(50, 50));
 	cage.populate();
-	cage.populateInfected(1);
+	cage.populateInfected(1, glfwGetTime());
 
 	float current_time = glfwGetTime();
 	float scaled_current_time = current_time;
@@ -43,20 +44,29 @@ int main(void) {
 
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
-		if (ImGui::Begin("Options")) {
-			ImGui::SliderFloat("Simulation speed", &SIMULATION_SPEED, 0.f, 100.f);
+		if (ImGui::Begin("Options", nullptr)) {
 
+			if (ImGui::Button("Repopulate")) {
+				cage.repopulate();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Populated 1 infected")) {
+				cage.populateInfected(1, scaled_current_time);
+			}
+			ImGui::SameLine();
+			ImGui::SliderFloat("Simulation speed", &SIMULATION_SPEED, 0.f, 100.f);
 		}
 		ImGui::End();
 		ImGui::Begin("My Window");
+		ImGui::Checkbox("Continue drawing", &continue_drawing);
 		static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit;
 		static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit;
 		if (ImPlot::BeginPlot("My Plot", "time", "people", ImVec2(-1, 0), 0, xflags, yflags)) {
 
-			ImPlot::PlotLine("Susceptible", susceptible.data(), susceptible.size(), CIRCLE_COUNT);
-			ImPlot::PlotLine("Infected", infected.data(), infected.size(), CIRCLE_COUNT);
-			ImPlot::PlotLine("Recovered", recovered.data(), recovered.size(), CIRCLE_COUNT);
-			ImPlot::PlotLine("Dead", dead.data(), dead.size(), CIRCLE_COUNT);
+			ImPlot::PlotLine("Susceptible", time.data(), susceptible.data(), susceptible.size());
+			ImPlot::PlotLine("Infected", time.data(), infected.data(), infected.size());
+			ImPlot::PlotLine("Recovered", time.data(), recovered.data(), recovered.size());
+			ImPlot::PlotLine("Dead", time.data(), dead.data(), dead.size());
 			ImPlot::EndPlot();
 		}
 		ImGui::End();
@@ -70,10 +80,13 @@ int main(void) {
 			ImDrawList* drawList = ImGui::GetWindowDrawList();
 
 			cage.update(scaled_current_time);
-			susceptible.push_back(cage.susceptible);
-			infected.push_back(cage.infected);
-			recovered.push_back(cage.recovered);
-			dead.push_back(cage.dead);
+			if (continue_drawing && SIMULATION_SPEED) {
+				susceptible.push_back(cage.susceptible);
+				infected.push_back(cage.infected);
+				recovered.push_back(cage.recovered);
+				dead.push_back(cage.dead);
+				time.push_back(scaled_current_time);
+			}
 
 			for (const auto& circle : cage.getCircles()) {
 				ImVec2 center = ImVec2(circle.center.x, circle.center.y);
@@ -97,7 +110,7 @@ int main(void) {
 	ImGui_ImplGlfw_Shutdown();
 	ImPlot::DestroyContext();
 	ImGui::DestroyContext();
-	
+
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	return 0;

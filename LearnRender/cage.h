@@ -41,12 +41,22 @@ public:
 		}
 	}
 
-	void populateInfected(int number_of_infected_to_populate) {
+	void repopulate() {
+		circles.clear();
+		susceptible = population_size_;
+		infected = 0;
+		recovered = 0;
+		dead = 0;
+		populate();
+	}
+
+	void populateInfected(int number_of_infected_to_populate, float infection_time) {
 		if (number_of_infected_to_populate > population_size_ || number_of_infected_to_populate <= 0) {
 			throw std::out_of_range("Number of infected to populate is invalid");
 		}
 		while (number_of_infected_to_populate--) {
 			circles[number_of_infected_to_populate].disease_stage = DiseaseStages::INFECTED;
+			circles[number_of_infected_to_populate].disease_stage_change_time = infection_time;
 		}
 		infected = number_of_infected_to_populate;
 		susceptible -= number_of_infected_to_populate;
