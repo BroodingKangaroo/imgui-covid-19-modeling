@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cage.h" />
+    <ClInclude Include="canvas.h" />
     <ClInclude Include="circle.h" />
     <ClInclude Include="random_generators.h" />
     <ClInclude Include="settings.h" />

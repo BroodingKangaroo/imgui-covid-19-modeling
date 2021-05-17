@@ -8,27 +8,29 @@
 #include "circle.h"
 #include "settings.h"
 #include "util.h"
-
-bool continue_drawing = true;
-std::vector<float>susceptible;
-std::vector<float>infected;
-std::vector<float>recovered;
-std::vector<float>dead;
-std::vector<float>time;
+#include "canvas.h"
 
 int main(void) {
-	GLFWwindow* window = create_window("COVID-19 modeling");
-	if (!window)	return -1;
+	GLFWwindow* window = GLFWBeginRendering("COVID-19 modeling");
+	if (!window) return -1;
+	
+	IMGUIBeginRendering(window);
 
-	Cage cage(300, 500, 500, glm::vec2(50, 50));
-	cage.populate();
-	cage.populateInfected(1, glfwGetTime());
+	Canvas canvas(glm::vec2(0, 0), VIEWPORT_HEIGHT, VIEWPORT_WIDTH);
 
-	float current_time = glfwGetTime();
-	float scaled_current_time = current_time;
+	canvas.addCage("first", Cage(200, 300, 300, glm::vec2(50, 100)));
+	canvas.populate("first");
+	canvas.populateInfected("first", 1, glfwGetTime());
+
+	canvas.addCage("second", Cage(200, 300, 300, glm::vec2(600, 100)));
+	canvas.populate("second");
+	canvas.populateInfected("second", 1, glfwGetTime());
+
+
+	TimeController time_controller;
+
 	while (!glfwWindowShouldClose(window)) {
-		scaled_current_time += (glfwGetTime() - current_time) * SIMULATION_SPEED;
-		current_time = glfwGetTime();
+		time_controller.update(SIMULATION_SPEED);
 
 		glClearColor(.5f, .5f, .5f, .5f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -44,51 +46,24 @@ int main(void) {
 
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
-		if (ImGui::Begin("Options", nullptr)) {
-
-			if (ImGui::Button("Repopulate")) {
-				cage.repopulate();
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Populated 1 infected")) {
-				cage.populateInfected(1, scaled_current_time);
-			}
-			ImGui::SameLine();
-			ImGui::SliderFloat("Simulation speed", &SIMULATION_SPEED, 0.f, 100.f);
-		}
-		ImGui::End();
-		ImGui::Begin("My Window");
-		ImGui::Checkbox("Continue drawing", &continue_drawing);
-		static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit;
-		static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit;
-		if (ImPlot::BeginPlot("My Plot", "time", "people", ImVec2(-1, 0), 0, xflags, yflags)) {
-
-			ImPlot::PlotLine("Susceptible", time.data(), susceptible.data(), susceptible.size());
-			ImPlot::PlotLine("Infected", time.data(), infected.data(), infected.size());
-			ImPlot::PlotLine("Recovered", time.data(), recovered.data(), recovered.size());
-			ImPlot::PlotLine("Dead", time.data(), dead.data(), dead.size());
-			ImPlot::EndPlot();
-		}
-		ImGui::End();
+		canvas.addUIControls(time_controller.scaled_current_time);
+		
+		canvas.drawData();
 
 		if (ImGui::Begin(
 			"Viewport", nullptr,
 			ImGuiWindowFlags_NoTitleBar |
 			ImGuiWindowFlags_NoMove |
 			ImGuiWindowFlags_NoBringToFrontOnFocus |
-			ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBackground)) {
+			ImGuiWindowFlags_NoFocusOnAppearing |
+			ImGuiWindowFlags_NoBackground
+		)) {
+
+			canvas.update(time_controller.scaled_current_time);
+
 			ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-			cage.update(scaled_current_time);
-			if (continue_drawing && SIMULATION_SPEED) {
-				susceptible.push_back(cage.susceptible);
-				infected.push_back(cage.infected);
-				recovered.push_back(cage.recovered);
-				dead.push_back(cage.dead);
-				time.push_back(scaled_current_time);
-			}
-
-			for (const auto& circle : cage.getCircles()) {
+			for (const auto& circle : canvas.getCirclesToDraw()) {
 				ImVec2 center = ImVec2(circle.center.x, circle.center.y);
 				ImColor color = switchColorByDiseaseStage(circle.disease_stage);
 				drawList->AddCircleFilled(center, circle.radius, color);

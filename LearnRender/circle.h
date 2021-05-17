@@ -7,8 +7,7 @@ enum class DiseaseStages {
 	SUSCEPTIBLE, INFECTED, RECOVERED, DEAD
 };
 
-class Circle {
-public:
+struct Circle {
 	glm::vec2 center = glm::vec2(10.f, 10.f);
 	glm::vec2 direction = glm::vec2(0.f, 0.f);
 	ImColor color;

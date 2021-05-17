@@ -98,5 +98,8 @@
     <ClInclude Include="vendor\implot\implot_internal.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="canvas.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

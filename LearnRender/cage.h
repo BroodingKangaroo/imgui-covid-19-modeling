@@ -8,29 +8,27 @@
 #include "random_generators.h"
 
 class Cage {
-	std::vector<Circle> circles;
+	std::vector<Circle> circles{};
 	int population_size_{};
-	int height_{};
-	int width_{};
-	glm::vec2 begin_{};
+	WindowCoordinates coordinates_{};
 	float last_update_time_{};
 public:
-	int susceptible;
-	int infected;
-	int recovered;
-	int dead;
-	Cage(int population_size, int height, int width, glm::vec2 center) :
+	int susceptible{};
+	int infected{};
+	int recovered{};
+	int dead{};
+
+	Cage() {}
+
+	Cage(int population_size, int height, int width, glm::vec2 top_left_corner) :
 		population_size_(population_size),
-		height_(height),
-		width_(width),
-		begin_(center),
-		last_update_time_(0),
+		coordinates_(top_left_corner, height, width),
 		susceptible(population_size) {}
 
 	void populate() {
 		circles.reserve(population_size_);
-		std::uniform_int_distribution<int> width_distribution_(begin_.x, width_);
-		std::uniform_int_distribution<int> height_distribution_(begin_.y, height_);
+		std::uniform_int_distribution<int> width_distribution_(coordinates_.top_left_corner.x, coordinates_.top_left_corner.x + coordinates_.width);
+		std::uniform_int_distribution<int> height_distribution_(coordinates_.top_left_corner.y, coordinates_.top_left_corner.y + coordinates_.height);
 		Circle circle;
 		for (int i = 0; i < population_size_; i++) {
 			circle.direction.x = x_direction_distribution(generator);
@@ -107,13 +105,13 @@ public:
 	}
 
 	glm::vec2* outsideViewport_(const Circle& c) {
-		if (c.center.x + c.radius > begin_.x + width_)
+		if (c.center.x + c.radius > coordinates_.top_left_corner.x + coordinates_.width)
 			return Intersection::RIGHT;
-		if (c.center.y + c.radius > begin_.y + height_)
+		if (c.center.y + c.radius > coordinates_.top_left_corner.y + coordinates_.height)
 			return Intersection::TOP;
-		if (c.center.x - c.radius < begin_.x)
+		if (c.center.x - c.radius < coordinates_.top_left_corner.x)
 			return Intersection::LEFT;
-		if (c.center.y - c.radius < begin_.y)
+		if (c.center.y - c.radius < coordinates_.top_left_corner.y)
 			return Intersection::BOTTOM;
 		return Intersection::NO_INTERSECTION;
 	}

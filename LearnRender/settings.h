@@ -1,10 +1,10 @@
 #pragma once
 #include "imgui.h"
 
-int VIEWPORT_WIDTH = 1280;
-int VIEWPORT_HEIGHT = 720;
+int VIEWPORT_WIDTH = 1680;
+int VIEWPORT_HEIGHT = 1020;
 
-float SIMULATION_SPEED = 0.f;
+float SIMULATION_SPEED = 0.0;
 
 ImColor SUSCEPTIBLE_COLOR = ImColor(255, 255, 0);
 ImColor INFECTED_COLOR = ImColor(255, 0, 0);
