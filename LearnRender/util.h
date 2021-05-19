@@ -44,7 +44,7 @@ struct GraphValues
 		}
 		static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit;
 		static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit;
-		if (ImPlot::BeginPlot("My Plot", "time", "people", ImVec2(-1, 0), 0, xflags, yflags)) {
+		if (ImPlot::BeginPlot("My Plot", "time", "people", ImVec2(700, 400), 0, xflags, yflags)) {
 
 			ImPlot::PlotLine("Susceptible", time.data(), susceptible.data(), susceptible.size());
 			ImPlot::PlotLine("Infected", time.data(), infected.data(), infected.size());
