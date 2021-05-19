@@ -1,8 +1,17 @@
 #pragma once
 #include <random>
 
-std::default_random_engine generator;
 
-std::uniform_real_distribution<double> x_direction_distribution(-1, 1);
-std::uniform_real_distribution<double> y_direction_distribution(-1, 1);
-std::uniform_real_distribution<double> death_distribution(0, 1);
+float gen_random_float_number(float min_value, float max_value) {
+    static std::default_random_engine e;
+    std::uniform_real_distribution<> dis(min_value, max_value);
+    return dis(e);
+}
+
+
+
+int gen_random_integer_number(int min_value, int max_value) {
+    static std::default_random_engine e;
+    std::uniform_int_distribution<> dis(min_value, max_value);
+    return dis(e);
+}

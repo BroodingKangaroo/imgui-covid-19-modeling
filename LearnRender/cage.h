@@ -29,14 +29,12 @@ public:
 		susceptible(population_size) {}
 
 	void populate() {
-		std::uniform_int_distribution<int> width_distribution_(coordinates_.top_left_corner.x, coordinates_.top_left_corner.x + coordinates_.width);
-		std::uniform_int_distribution<int> height_distribution_(coordinates_.top_left_corner.y, coordinates_.top_left_corner.y + coordinates_.height);
 		Circle circle;
 		for (int i = 0; i < population_size_; i++) {
-			circle.direction.x = x_direction_distribution(generator);
-			circle.direction.y = y_direction_distribution(generator);
-			circle.center.x = width_distribution_(generator);
-			circle.center.y = height_distribution_(generator);
+			circle.direction.x = gen_random_float_number(-1.0f, 1.0f);
+			circle.direction.y = gen_random_float_number(-1.0f, 1.0f);
+			circle.center.x = gen_random_integer_number(coordinates_.top_left_corner.x, coordinates_.top_left_corner.x + coordinates_.width);
+			circle.center.y = gen_random_integer_number(coordinates_.top_left_corner.y, coordinates_.top_left_corner.y + coordinates_.height);
 			circle.home_cage = const_cast<char*>(name);
 			circle.current_cage = circle.home_cage;
 			circles.push_back(circle);
@@ -58,6 +56,8 @@ public:
 		}
 		auto circle = circles.begin();
 		while (number_of_infected_to_populate--) {
+			circle->recovery_time = gen_random_integer_number(RECOVERY_TIME_MIN, RECOVERY_TIME_MAX);
+			
 			circle->disease_stage = DiseaseStages::INFECTED;
 			circle->disease_stage_change_time = infection_time;
 			circle = ++circle;
@@ -85,11 +85,14 @@ public:
 	}
 
 	void markIntersectionCircles_(const float& current_time) {
+		std::uniform_real_distribution<float> infect_distribution(0, 1);
 		for (auto& covidCircle : circles) {
 			if (covidCircle.disease_stage == DiseaseStages::INFECTED) {
 				for (auto& circle : circles) {
-					if (circle.disease_stage == DiseaseStages::SUSCEPTIBLE && intersect(covidCircle, circle)) {
+					if (circle.disease_stage == DiseaseStages::SUSCEPTIBLE && intersect(covidCircle, circle) && gen_random_float_number(0, 1) < INFECTION_PROBABILITY) {
 						circle.disease_stage = DiseaseStages::INFECTED;
+						
+						circle.recovery_time = gen_random_integer_number(RECOVERY_TIME_MIN, RECOVERY_TIME_MAX);
 						circle.disease_stage_change_time = current_time;
 						susceptible--;
 						infected++;
@@ -129,8 +132,8 @@ public:
 	void changeDiseaseStageOverTime_(const float& current_time) {
 		for (auto& circle : circles) {
 			float dTime = current_time - circle.disease_stage_change_time;
-			if (circle.disease_stage == DiseaseStages::INFECTED && dTime >= RECOVERY_TIME) {
-				if (death_distribution(generator) < DEATH_PROBABILITY) {
+			if (circle.disease_stage == DiseaseStages::INFECTED && dTime >= circle.recovery_time) {
+				if (gen_random_float_number(0, 1) < DEATH_PROBABILITY) {
 					circle.disease_stage = DiseaseStages::DEAD;
 					dead++;
 				} else {

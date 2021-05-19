@@ -24,6 +24,7 @@ struct Circle {
 	char* destination_cage;
 	char* current_cage;
 	float arrived_in;
+	float recovery_time;
 
 	Circle() {
 		static int id_ = 0;
