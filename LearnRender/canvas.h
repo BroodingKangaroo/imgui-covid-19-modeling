@@ -1,4 +1,5 @@
 #pragma once
+
 #include <unordered_map>
 #include <string>
 
@@ -13,11 +14,11 @@ class Canvas {
 public:
 	Canvas(glm::vec2 top_left_corner, int height, int width) : coordinates_(top_left_corner, height, width) {}
 
-	void addCage(const char* name, Cage cage) {
-		cages[name] = cage;
+	void addCage(Cage cage) {
+		cages[cage.name] = cage;
 	}
 
-	std::unordered_map<const char*, Cage> getCages() {
+	std::unordered_map<const char*, Cage>& getCages() {
 		return cages;
 	}
 
@@ -44,7 +45,8 @@ public:
 				dead_total += cage.second.dead;
 			}
 		}
-		graph_values_.update(susceptible_total, infected_total, recovered_total, dead_total, scaled_current_time);
+		if (SIMULATION_SPEED)
+			graph_values_.update(susceptible_total, infected_total, recovered_total, dead_total, scaled_current_time);
 	}
 
 	std::vector<Circle> getCirclesToDraw() {
@@ -62,22 +64,24 @@ public:
 	}
 
 	void addUIControls(float scaled_current_time) {
-		if (ImGui::Begin("Configuration", nullptr)) {
+		ImGui::SetNextWindowSize(ImVec2(400, 300));
+		ImGui::SetNextWindowPos(ImVec2(VIEWPORT_WIDTH - 400, 0));
+		bool p_open = true;
+		if (ImGui::Begin("Configuration",  &p_open)) {
 			if (ImGui::CollapsingHeader("Cage configuration")) {
-				for (auto& entry : cages) {
-					if (ImGui::TreeNode(entry.first)) {
+				for (auto& [cage_name, cage] : cages) {
+					if (ImGui::TreeNode(cage_name)) {
 						if (ImGui::Button("Repopulate")) {
-							entry.second.repopulate();
+							cage.repopulate();
 						}
 						ImGui::SameLine();
 						if (ImGui::Button("Populated 1 infected")) {
-							entry.second.populateInfected(1, scaled_current_time);
+							cage.populateInfected(1, scaled_current_time);
 						}
 						ImGui::TreePop();
 					}
 				}
 			}
-			
 			ImGui::SliderFloat("Simulation speed", &SIMULATION_SPEED, 0.f, 100.f);
 		}
 		ImGui::End();

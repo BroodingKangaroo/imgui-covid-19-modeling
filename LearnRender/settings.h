@@ -13,8 +13,10 @@ ImColor RECOVERED_COLOR = ImColor(0, 255, 0);
 
 int CIRCLE_COUNT = 100;
 
-float RECOVERY_TIME = 100;
+float RECOVERY_TIME = 1000;
 
 float DEATH_PROBABILITY = 0.3;
 
 bool SHOW_DEMO_WINDOW = true;
+
+float TIME_TO_REST_IN_CAGE = 1000;

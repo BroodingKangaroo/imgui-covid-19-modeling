@@ -1,4 +1,5 @@
 #pragma once
+#include <list>
 #include <random>
 #include <stdexcept>
 #include <vector>
@@ -8,11 +9,12 @@
 #include "random_generators.h"
 
 class Cage {
-	std::vector<Circle> circles{};
+	std::list<Circle> circles{};
 	int population_size_{};
 	WindowCoordinates coordinates_{};
 	float last_update_time_{};
 public:
+	const char* name{};
 	int susceptible{};
 	int infected{};
 	int recovered{};
@@ -20,13 +22,13 @@ public:
 
 	Cage() {}
 
-	Cage(int population_size, int height, int width, glm::vec2 top_left_corner) :
+	Cage(int population_size, int height, int width, glm::vec2 top_left_corner, const char* name_) :
 		population_size_(population_size),
 		coordinates_(top_left_corner, height, width),
+		name(name_),
 		susceptible(population_size) {}
 
 	void populate() {
-		circles.reserve(population_size_);
 		std::uniform_int_distribution<int> width_distribution_(coordinates_.top_left_corner.x, coordinates_.top_left_corner.x + coordinates_.width);
 		std::uniform_int_distribution<int> height_distribution_(coordinates_.top_left_corner.y, coordinates_.top_left_corner.y + coordinates_.height);
 		Circle circle;
@@ -35,6 +37,8 @@ public:
 			circle.direction.y = y_direction_distribution(generator);
 			circle.center.x = width_distribution_(generator);
 			circle.center.y = height_distribution_(generator);
+			circle.home_cage = const_cast<char*>(name);
+			circle.current_cage = circle.home_cage;
 			circles.push_back(circle);
 		}
 	}
@@ -52,9 +56,11 @@ public:
 		if (number_of_infected_to_populate > population_size_ || number_of_infected_to_populate <= 0) {
 			throw std::out_of_range("Number of infected to populate is invalid");
 		}
+		auto circle = circles.begin();
 		while (number_of_infected_to_populate--) {
-			circles[number_of_infected_to_populate].disease_stage = DiseaseStages::INFECTED;
-			circles[number_of_infected_to_populate].disease_stage_change_time = infection_time;
+			circle->disease_stage = DiseaseStages::INFECTED;
+			circle->disease_stage_change_time = infection_time;
+			circle = ++circle;
 		}
 		infected = number_of_infected_to_populate;
 		susceptible -= number_of_infected_to_populate;
@@ -70,8 +76,12 @@ public:
 		last_update_time_ = current_time;
 	}
 
-	std::vector<Circle> getCircles() const {
+	std::list<Circle> getCircles() const {
 		return circles;
+	}
+
+	void removeCircle(const std::list<Circle>::iterator& circle_iterator) {
+		circles.erase(circle_iterator);
 	}
 
 	void markIntersectionCircles_(const float& current_time) {
@@ -96,7 +106,7 @@ public:
 			glm::vec2 newCenter = circle.center + circle.direction * delta_time;
 			circle.center = newCenter;
 			glm::vec2* intersection = outsideViewport_(circle);
-			if (intersection) {
+			if (circle.circle_moving_state==CircleMovingState::RESTING && intersection) {
 				circle.center = oldCenter;
 				reflectVector2(circle.direction, *intersection);
 			}
@@ -105,13 +115,13 @@ public:
 	}
 
 	glm::vec2* outsideViewport_(const Circle& c) {
-		if (c.center.x + c.radius > coordinates_.top_left_corner.x + coordinates_.width)
+		if (c.center.x > coordinates_.top_left_corner.x + coordinates_.width)
 			return Intersection::RIGHT;
-		if (c.center.y + c.radius > coordinates_.top_left_corner.y + coordinates_.height)
+		if (c.center.y > coordinates_.top_left_corner.y + coordinates_.height)
 			return Intersection::TOP;
-		if (c.center.x - c.radius < coordinates_.top_left_corner.x)
+		if (c.center.x < coordinates_.top_left_corner.x)
 			return Intersection::LEFT;
-		if (c.center.y - c.radius < coordinates_.top_left_corner.y)
+		if (c.center.y < coordinates_.top_left_corner.y)
 			return Intersection::BOTTOM;
 		return Intersection::NO_INTERSECTION;
 	}
@@ -130,5 +140,36 @@ public:
 				infected--;
 			}
 		}
+	}
+
+	bool surrounds(glm::vec2 center) {
+		if (center.x > coordinates_.top_left_corner.x
+			&& center.x < coordinates_.top_left_corner.x + coordinates_.width
+			&& center.y > coordinates_.top_left_corner.y
+			&& center.y < coordinates_.top_left_corner.y + coordinates_.height) {
+			return true;
+		}
+		return false;
+	}
+
+	std::list<Circle>::iterator addCircle(std::list<Circle>::iterator& value) {
+		circles.emplace_back(*value);
+		return std::prev(circles.end());
+	}
+
+	WindowCoordinates getCoordinates() const {
+		return coordinates_;
+	}
+
+	std::vector<std::list<Circle>::iterator> addDestination(char* destination_cage_name, int amount_of_circles) {
+		std::vector<std::list<Circle>::iterator> iterators;
+		auto circle_iterator = circles.begin();
+		while(circle_iterator != circles.end() && amount_of_circles-- > 0) {
+			circle_iterator->destination_cage = destination_cage_name;
+			circle_iterator->circle_moving_state = CircleMovingState::MOVING_TO_DESTINATION_CAGE;
+			iterators.emplace_back(circle_iterator);
+			++circle_iterator;
+		}
+		return iterators;
 	}
 };

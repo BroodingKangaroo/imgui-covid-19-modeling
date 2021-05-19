@@ -27,9 +27,21 @@ struct GraphValues
 		}
 	}
 
+	void clearGraphData() {
+		susceptible.clear();
+		infected.clear();
+		recovered.clear();
+		dead.clear();
+		time.clear();
+	}
+
 	void drawData() {
 		ImGui::Begin("Graph");
 		ImGui::Checkbox("Continue drawing", &continue_drawing);
+		ImGui::SameLine();
+		if (ImGui::Button("Clear graph")) {
+			clearGraphData();
+		}
 		static ImPlotAxisFlags xflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit;
 		static ImPlotAxisFlags yflags = ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_RangeFit;
 		if (ImPlot::BeginPlot("My Plot", "time", "people", ImVec2(-1, 0), 0, xflags, yflags)) {

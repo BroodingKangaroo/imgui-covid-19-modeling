@@ -60,6 +60,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)vendor\GLFW\include\;$(SolutionDir)vendor\glad\include\;$(SolutionDir)vendor\glm\include\;$(ProjectDir)vendor\imgui\;$(ProjectDir)vendor\implot\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -103,6 +104,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cage.h" />
+    <ClInclude Include="cage_mediator.h" />
     <ClInclude Include="canvas.h" />
     <ClInclude Include="circle.h" />
     <ClInclude Include="random_generators.h" />

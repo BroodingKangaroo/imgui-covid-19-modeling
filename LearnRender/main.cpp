@@ -9,6 +9,7 @@
 #include "settings.h"
 #include "util.h"
 #include "canvas.h"
+#include "cage_mediator.h"
 
 int main(void) {
 	GLFWwindow* window = GLFWBeginRendering("COVID-19 modeling");
@@ -18,20 +19,30 @@ int main(void) {
 
 	Canvas canvas(glm::vec2(0, 0), VIEWPORT_HEIGHT, VIEWPORT_WIDTH);
 
-	canvas.addCage("first", Cage(200, 300, 300, glm::vec2(50, 100)));
-	canvas.populate("first");
-	canvas.populateInfected("first", 1, glfwGetTime());
+	
+	canvas.addCage(Cage(10, 300, 300, glm::vec2(50, 200), "home"));
+	canvas.populate("home");
+	//canvas.populateInfected("home", 3, glfwGetTime());
 
-	canvas.addCage("second", Cage(200, 300, 300, glm::vec2(600, 100)));
-	canvas.populate("second");
-	canvas.populateInfected("second", 1, glfwGetTime());
+	canvas.addCage(Cage(30, 300, 300, glm::vec2(500, 200), "middle"));
+	canvas.populate("middle");
+	canvas.populateInfected("middle", 10, glfwGetTime());
+
+	canvas.addCage(Cage(10, 300, 300, glm::vec2(950, 200), "destination"));
+	canvas.populate("destination");
+	//canvas.populateInfected("destination", 1, glfwGetTime());
+
+	CageMediator cage_mediator(&canvas);
+
+	cage_mediator.addDestination("home", "destination", 5);
 
 
 	TimeController time_controller;
 
 	while (!glfwWindowShouldClose(window)) {
 		time_controller.update(SIMULATION_SPEED);
-
+		cage_mediator.update(time_controller.scaled_current_time);
+		
 		glClearColor(.5f, .5f, .5f, .5f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -39,10 +50,10 @@ int main(void) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		if (SHOW_DEMO_WINDOW) {
+		/*if (SHOW_DEMO_WINDOW) {
 			ImPlot::ShowDemoWindow();
 			ImGui::ShowDemoWindow(&SHOW_DEMO_WINDOW);
-		}
+		}*/
 
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 

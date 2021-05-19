@@ -7,14 +7,32 @@ enum class DiseaseStages {
 	SUSCEPTIBLE, INFECTED, RECOVERED, DEAD
 };
 
+enum class CircleMovingState {
+	RESTING, MOVING_TO_HOME_CAGE, MOVING_TO_DESTINATION_CAGE
+};
+
 struct Circle {
 	glm::vec2 center = glm::vec2(10.f, 10.f);
 	glm::vec2 direction = glm::vec2(0.f, 0.f);
-	ImColor color;
-
 	float radius = 3.f;
+
+	int id;
+	CircleMovingState circle_moving_state = CircleMovingState::RESTING;
 	DiseaseStages disease_stage = DiseaseStages::SUSCEPTIBLE;
 	float disease_stage_change_time = 0;
+	char* home_cage;
+	char* destination_cage;
+	char* current_cage;
+	float arrived_in;
+
+	Circle() {
+		static int id_ = 0;
+		id = ++id_;
+	}
+
+	bool operator==(const Circle& rhs) const {
+		return rhs.id == id;
+	}
 };
 
 bool intersect(const Circle& c1, const Circle& c2) {
