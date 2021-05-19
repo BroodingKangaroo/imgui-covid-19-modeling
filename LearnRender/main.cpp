@@ -20,20 +20,29 @@ int main(void) {
 	Canvas canvas(glm::vec2(0, 0), VIEWPORT_HEIGHT, VIEWPORT_WIDTH);
 
 	
-	canvas.addCage(Cage(10, 300, 300, glm::vec2(50, 200), "home"));
+	canvas.addCage(Cage(20, 300, 300, glm::vec2(50, 150), "home"));
 	canvas.populate("home");
 	//canvas.populateInfected("home", 3, glfwGetTime());
 
-	canvas.addCage(Cage(30, 300, 300, glm::vec2(500, 200), "middle"));
-	canvas.populate("middle");
-	canvas.populateInfected("middle", 10, glfwGetTime());
+	canvas.addCage(Cage(30, 300, 300, glm::vec2(500, 150), "middle1"));
+	canvas.populate("middle1");
+	canvas.populateInfected("middle1", 5, glfwGetTime());
 
-	canvas.addCage(Cage(10, 300, 300, glm::vec2(950, 200), "destination"));
+	canvas.addCage(Cage(200, 400, 400, glm::vec2(50, 550), "middle2"));
+	canvas.populate("middle2");
+	//canvas.populateInfected("middle2", 5, glfwGetTime());
+
+	canvas.addCage(Cage(40, 300, 300, glm::vec2(550, 550), "middle3"));
+	canvas.populate("middle3");
+
+	canvas.addCage(Cage(100, 300, 300, glm::vec2(950, 150), "destination"));
 	canvas.populate("destination");
 	//canvas.populateInfected("destination", 1, glfwGetTime());
 
 	CageMediator cage_mediator(&canvas);
 
+	cage_mediator.addDestination("middle2", "middle3", 10);
+	cage_mediator.addDestination("middle3", "destination", 7);
 	cage_mediator.addDestination("home", "destination", 5);
 
 
@@ -78,6 +87,12 @@ int main(void) {
 				ImVec2 center = ImVec2(circle.center.x, circle.center.y);
 				ImColor color = switchColorByDiseaseStage(circle.disease_stage);
 				drawList->AddCircleFilled(center, circle.radius, color);
+			}
+
+			for (const auto& [name, cage] : canvas.getCages()) {
+				ImVec2 left = ImVec2(cage.getCoordinates().top_left_corner.x - 1, cage.getCoordinates().top_left_corner.y - 1);
+				ImVec2 right = ImVec2(left.x + cage.getCoordinates().width + 3, left.y + cage.getCoordinates().height + 3);
+				drawList->AddRect(left, right, BORDER_COLOR, 1, ImDrawFlags(), 2);
 			}
 		}
 		ImGui::End();
