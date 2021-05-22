@@ -49,16 +49,6 @@ public:
 			graph_values_.update(susceptible_total, infected_total, recovered_total, dead_total, scaled_current_time);
 	}
 
-	std::vector<Circle> getCirclesToDraw() {
-		std::vector<Circle>circles;
-		for (auto& entry : cages) {
-			for (Circle& circle : entry.second.getCircles()) {
-				circles.emplace_back(circle);
-			}
-		}
-		return circles;
-	}
-
 	void drawData() {
 		graph_values_.drawData();
 	}
@@ -84,6 +74,33 @@ public:
 			}
 			ImGui::SliderFloat("Simulation speed", &SIMULATION_SPEED, 0.f, 100.f);
 		}
+		ImGui::ShowDemoWindow(&SHOW_DEMO_WINDOW);
 		ImGui::End();
+	}
+
+	void drawCircles(ImDrawList* drawList) {
+		for (auto& entry : cages) {
+			for (Circle& circle : entry.second.getCircles()) {
+				ImVec2 center = ImVec2(circle.center.x, circle.center.y);
+				ImColor color = switchColorByDiseaseStage(circle.disease_stage);
+				drawList->AddCircleFilled(center, circle.radius, color);
+			}
+		}
+	}
+
+	void drawCages(ImDrawList* drawList) {
+		for (const auto& [name, cage] : cages) {
+			const auto cage_coordinates = cage.getCoordinates();
+			ImVec2 left = ImVec2(cage_coordinates.top_left_corner.x - 1, cage_coordinates.top_left_corner.y - 1);
+			ImVec2 right = ImVec2(left.x + cage_coordinates.width + 3, left.y + cage_coordinates.height + 3);
+			drawList->AddRect(left, right, BORDER_COLOR, 1, ImDrawFlags(), 2);
+			drawList->AddText(
+				ImGui::GetFont(),
+				CAGE_FONT_SIZE,
+				ImVec2(left.x + cage_coordinates.width / 2. - CAGE_FONT_SIZE / 2. * std::strlen(cage.name) / 2., left.y - 25),
+				CAGE_NAME_COLOR, 
+				cage.name
+			);
+		}
 	}
 };

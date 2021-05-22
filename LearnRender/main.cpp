@@ -19,6 +19,11 @@ int main(void) {
 
 	Canvas canvas(glm::vec2(0, 0), VIEWPORT_HEIGHT, VIEWPORT_WIDTH);
 
+	/*canvas.addCage(Cage(200, 500, 500, glm::vec2(150, 150), "home"));
+	canvas.populate("home");
+	canvas.populateInfected("home", 1, glfwGetTime());*/
+	
+	
 	
 	canvas.addCage(Cage(20, 300, 300, glm::vec2(50, 150), "home"));
 	canvas.populate("home");
@@ -59,12 +64,12 @@ int main(void) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		/*if (SHOW_DEMO_WINDOW) {
-			ImPlot::ShowDemoWindow();
-			ImGui::ShowDemoWindow(&SHOW_DEMO_WINDOW);
-		}*/
-
 		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+
+		if (SHOW_DEMO_WINDOW) {
+			//ImPlot::ShowDemoWindow();
+			ImGui::ShowDemoWindow(&SHOW_DEMO_WINDOW);
+		}
 
 		canvas.addUIControls(time_controller.scaled_current_time);
 		
@@ -83,17 +88,9 @@ int main(void) {
 
 			ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-			for (const auto& circle : canvas.getCirclesToDraw()) {
-				ImVec2 center = ImVec2(circle.center.x, circle.center.y);
-				ImColor color = switchColorByDiseaseStage(circle.disease_stage);
-				drawList->AddCircleFilled(center, circle.radius, color);
-			}
+			canvas.drawCircles(drawList);
 
-			for (const auto& [name, cage] : canvas.getCages()) {
-				ImVec2 left = ImVec2(cage.getCoordinates().top_left_corner.x - 1, cage.getCoordinates().top_left_corner.y - 1);
-				ImVec2 right = ImVec2(left.x + cage.getCoordinates().width + 3, left.y + cage.getCoordinates().height + 3);
-				drawList->AddRect(left, right, BORDER_COLOR, 1, ImDrawFlags(), 2);
-			}
+			canvas.drawCages(drawList);
 		}
 		ImGui::End();
 
