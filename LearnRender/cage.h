@@ -11,7 +11,7 @@
 class Cage {
 	std::list<Circle> circles{};
 	int population_size_{};
-	WindowCoordinates coordinates_{};
+	Coordinates coordinates_{};
 	float last_update_time_{};
 public:
 	const char* name{};
@@ -160,7 +160,7 @@ public:
 		return std::prev(circles.end());
 	}
 
-	WindowCoordinates getCoordinates() const {
+	Coordinates getCoordinates() const {
 		return coordinates_;
 	}
 

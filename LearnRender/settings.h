@@ -10,6 +10,11 @@ ImColor SUSCEPTIBLE_COLOR = ImColor(255, 255, 0);
 ImColor INFECTED_COLOR = ImColor(255, 0, 0);
 ImColor DEAD_COLOR = ImColor(0, 0, 0);
 ImColor RECOVERED_COLOR = ImColor(0, 255, 0);
+
+ImColor GREEN_COLOR = ImColor(0, 255, 0);
+ImColor RED_COLOR = ImColor(255, 0, 0);
+
+
 int CAGE_FONT_SIZE = 20;
 ImColor BORDER_COLOR = ImColor(180, 180, 180);
 ImColor CAGE_NAME_COLOR = ImColor(200, 200, 20);

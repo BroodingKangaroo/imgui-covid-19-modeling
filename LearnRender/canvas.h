@@ -1,16 +1,15 @@
 #pragma once
 
 #include <unordered_map>
-#include <string>
 
 #include "cage.h"
 #include "util.h"
 
 class Canvas {
 	int number_of_cages_{};
-	WindowCoordinates coordinates_;
+	Coordinates coordinates_;
 	std::unordered_map<const char*, Cage> cages;
-	GraphValues graph_values_;
+	GraphData graph_values_;
 public:
 	Canvas(glm::vec2 top_left_corner, int height, int width) : coordinates_(top_left_corner, height, width) {}
 
@@ -49,35 +48,33 @@ public:
 			graph_values_.update(susceptible_total, infected_total, recovered_total, dead_total, scaled_current_time);
 	}
 
-	void drawData() {
-		graph_values_.drawData();
+	GraphData& getGraphData() {
+		return graph_values_;
 	}
 
-	void addUIControls(float scaled_current_time) {
-		ImGui::SetNextWindowSize(ImVec2(400, 300));
-		ImGui::SetNextWindowPos(ImVec2(VIEWPORT_WIDTH - 400, 0));
-		bool p_open = true;
-		if (ImGui::Begin("Configuration",  &p_open)) {
-			if (ImGui::CollapsingHeader("Cage configuration")) {
-				for (auto& [cage_name, cage] : cages) {
-					if (ImGui::TreeNode(cage_name)) {
-						if (ImGui::Button("Repopulate")) {
-							cage.repopulate();
-						}
-						ImGui::SameLine();
-						if (ImGui::Button("Populated 1 infected")) {
-							cage.populateInfected(1, scaled_current_time);
-						}
-						ImGui::TreePop();
-					}
-				}
-			}
-			ImGui::SliderFloat("Simulation speed", &SIMULATION_SPEED, 0.f, 100.f);
+	bool isCoordinatesValid(int* left_corner, int* size) {
+		if (left_corner[0] <= 0 || left_corner[1] <= 0 || size[0] <= 0 || size[1] <= 0 || size[0] + left_corner[0] > VIEWPORT_WIDTH || size[1] + left_corner[1] > VIEWPORT_HEIGHT) {
+			return false;
 		}
-		ImGui::ShowDemoWindow(&SHOW_DEMO_WINDOW);
-		ImGui::End();
+		return true;
 	}
 
+	bool isOverlapCages(int* left_corner, int* size) {
+		for (const auto& [cage_name, cage] : cages) {
+			auto cage_coordinates = cage.getCoordinates();
+			if (isOverlap(
+				cage.getCoordinates(),
+				Coordinates(
+					glm::vec2(left_corner[0], left_corner[1]),
+					left_corner[0] + size[0],
+					left_corner[1] + size[1])
+			)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	void drawCircles(ImDrawList* drawList) {
 		for (auto& entry : cages) {
 			for (Circle& circle : entry.second.getCircles()) {
@@ -102,5 +99,14 @@ public:
 				cage.name
 			);
 		}
+	}
+
+	bool isCageNameRepeats(char* cage_name) {
+		for (auto& [name, cage] : cages) {
+			if (std::strcmp(name, cage_name) == 0) { // 0 means equal
+				return false;
+			}
+		}
+		return true;
 	}
 };

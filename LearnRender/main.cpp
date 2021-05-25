@@ -10,6 +10,8 @@
 #include "util.h"
 #include "canvas.h"
 #include "cage_mediator.h"
+#include "ui_controls.h"
+
 
 int main(void) {
 	GLFWwindow* window = GLFWBeginRendering("COVID-19 modeling");
@@ -25,33 +27,32 @@ int main(void) {
 	
 	
 	
-	canvas.addCage(Cage(20, 300, 300, glm::vec2(50, 150), "home"));
-	canvas.populate("home");
-	//canvas.populateInfected("home", 3, glfwGetTime());
+	//canvas.addCage(Cage(20, 300, 300, glm::vec2(50, 150), "home"));
+	//canvas.populate("home");
 
-	canvas.addCage(Cage(30, 300, 300, glm::vec2(500, 150), "middle1"));
-	canvas.populate("middle1");
-	canvas.populateInfected("middle1", 5, glfwGetTime());
+	//canvas.addCage(Cage(30, 300, 300, glm::vec2(500, 150), "middle1"));
+	//canvas.populate("middle1");
+	//canvas.populateInfected("middle1", 5, glfwGetTime());
 
-	canvas.addCage(Cage(200, 400, 400, glm::vec2(50, 550), "middle2"));
-	canvas.populate("middle2");
-	//canvas.populateInfected("middle2", 5, glfwGetTime());
+	//canvas.addCage(Cage(200, 400, 400, glm::vec2(50, 550), "middle2"));
+	//canvas.populate("middle2");
 
-	canvas.addCage(Cage(40, 300, 300, glm::vec2(550, 550), "middle3"));
-	canvas.populate("middle3");
+	//canvas.addCage(Cage(40, 300, 300, glm::vec2(550, 550), "middle3"));
+	//canvas.populate("middle3");
 
-	canvas.addCage(Cage(100, 300, 300, glm::vec2(950, 150), "destination"));
-	canvas.populate("destination");
-	//canvas.populateInfected("destination", 1, glfwGetTime());
+	//canvas.addCage(Cage(100, 300, 300, glm::vec2(950, 150), "destination"));
+	//canvas.populate("destination");
 
 	CageMediator cage_mediator(&canvas);
 
-	cage_mediator.addDestination("middle2", "middle3", 10);
-	cage_mediator.addDestination("middle3", "destination", 7);
-	cage_mediator.addDestination("home", "destination", 5);
+	//cage_mediator.addDestination("middle2", "middle3", 10);
+	//cage_mediator.addDestination("middle3", "destination", 7);
+	//cage_mediator.addDestination("home", "destination", 5);
+	UIControls ui_controls(canvas, cage_mediator);
 
 
 	TimeController time_controller;
+	
 
 	while (!glfwWindowShouldClose(window)) {
 		time_controller.update(SIMULATION_SPEED);
@@ -64,16 +65,7 @@ int main(void) {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-
-		if (SHOW_DEMO_WINDOW) {
-			//ImPlot::ShowDemoWindow();
-			ImGui::ShowDemoWindow(&SHOW_DEMO_WINDOW);
-		}
-
-		canvas.addUIControls(time_controller.scaled_current_time);
-		
-		canvas.drawData();
+		ui_controls.update(time_controller.scaled_current_time);
 
 		if (ImGui::Begin(
 			"Viewport", nullptr,

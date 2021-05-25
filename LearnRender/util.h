@@ -8,7 +8,7 @@
 #include "imgui_impl_opengl3.h"
 #include "settings.h"
 
-struct GraphValues
+struct GraphData
 {
 	std::vector<float>susceptible;
 	std::vector<float>infected;
@@ -77,14 +77,14 @@ struct TimeController
 	}
 };
 
-struct WindowCoordinates {
+struct Coordinates {
 	glm::vec2 top_left_corner{};
 	int height{};
 	int width{};
 
-	WindowCoordinates(){}
+	Coordinates(){}
 	
-	WindowCoordinates(glm::vec<2, float, glm::defaultp> top_left_corner_, int height_, int width_) :
+	Coordinates(glm::vec<2, float, glm::defaultp> top_left_corner_, int height_, int width_) :
 		top_left_corner(top_left_corner_),
 		height(height_),
 		width(width_) {}
@@ -152,4 +152,13 @@ void IMGUIBeginRendering(GLFWwindow* window) {
 
 void reflectVector2(glm::vec2& v, glm::vec2 reflection) {
 	v *= reflection;
+}
+
+bool isOverlap(Coordinates a, Coordinates b) {
+	const glm::vec2 leftA = a.top_left_corner, rightA = glm::vec2(a.top_left_corner + glm::vec2(a.width, a.height));
+	const glm::vec2 leftB = b.top_left_corner, rightB = glm::vec2(b.top_left_corner + glm::vec2(b.width, b.height));
+	if (leftA.x > rightB.x || rightA.x < leftB.x || leftA.y > rightB.y || rightA.y < leftB.y) {
+		return false;
+	}
+	return true;
 }

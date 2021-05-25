@@ -88,7 +88,7 @@ public:
 
 private:
 	glm::vec2 calculateCircleDirectionByCageName_(glm::vec2 circle_center, const char* cage_name) const {
-		WindowCoordinates cage_coordinates = (*canvas_)[cage_name].getCoordinates();
+		Coordinates cage_coordinates = (*canvas_)[cage_name].getCoordinates();
 		float cage_center_x = cage_coordinates.top_left_corner.x + cage_coordinates.width / 2. - circle_center.x;
 		float cage_center_y = cage_coordinates.top_left_corner.y + cage_coordinates.height / 2. - circle_center.y;
 		float max_coordinate = std::max(abs(cage_center_x), abs(cage_center_y));

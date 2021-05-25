@@ -110,6 +110,7 @@
     <ClInclude Include="circle.h" />
     <ClInclude Include="random_generators.h" />
     <ClInclude Include="settings.h" />
+    <ClInclude Include="ui_controls.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
