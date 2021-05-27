@@ -4,8 +4,6 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include "cage.h"
-#include "circle.h"
 #include "settings.h"
 #include "util.h"
 #include "canvas.h"
@@ -21,35 +19,9 @@ int main(void) {
 
 	Canvas canvas(glm::vec2(0, 0), VIEWPORT_HEIGHT, VIEWPORT_WIDTH);
 
-	/*canvas.addCage(Cage(200, 500, 500, glm::vec2(150, 150), "home"));
-	canvas.populate("home");
-	canvas.populateInfected("home", 1, glfwGetTime());*/
-	
-	
-	
-	//canvas.addCage(Cage(20, 300, 300, glm::vec2(50, 150), "home"));
-	//canvas.populate("home");
-
-	//canvas.addCage(Cage(30, 300, 300, glm::vec2(500, 150), "middle1"));
-	//canvas.populate("middle1");
-	//canvas.populateInfected("middle1", 5, glfwGetTime());
-
-	//canvas.addCage(Cage(200, 400, 400, glm::vec2(50, 550), "middle2"));
-	//canvas.populate("middle2");
-
-	//canvas.addCage(Cage(40, 300, 300, glm::vec2(550, 550), "middle3"));
-	//canvas.populate("middle3");
-
-	//canvas.addCage(Cage(100, 300, 300, glm::vec2(950, 150), "destination"));
-	//canvas.populate("destination");
-
 	CageMediator cage_mediator(&canvas);
-
-	//cage_mediator.addDestination("middle2", "middle3", 10);
-	//cage_mediator.addDestination("middle3", "destination", 7);
-	//cage_mediator.addDestination("home", "destination", 5);
+	
 	UIControls ui_controls(canvas, cage_mediator);
-
 
 	TimeController time_controller;
 	

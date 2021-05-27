@@ -20,9 +20,9 @@ struct Circle {
 	CircleMovingState circle_moving_state = CircleMovingState::RESTING;
 	DiseaseStages disease_stage = DiseaseStages::SUSCEPTIBLE;
 	float disease_stage_change_time = 0;
-	char* home_cage;
-	char* destination_cage;
-	char* current_cage;
+	std::string home_cage;
+	std::string destination_cage;
+	std::string current_cage;
 	float arrived_in;
 	float recovery_time;
 

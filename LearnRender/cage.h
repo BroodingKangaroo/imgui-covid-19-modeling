@@ -14,7 +14,7 @@ class Cage {
 	Coordinates coordinates_{};
 	float last_update_time_{};
 public:
-	const char* name{};
+	std::string name;
 	int susceptible{};
 	int infected{};
 	int recovered{};
@@ -22,11 +22,12 @@ public:
 
 	Cage() {}
 
-	Cage(int population_size, int height, int width, glm::vec2 top_left_corner, const char* name_) :
+	Cage(int population_size, int height, int width, glm::vec2 top_left_corner, std::string name_) :
 		population_size_(population_size),
 		coordinates_(top_left_corner, height, width),
 		name(name_),
-		susceptible(population_size) {}
+		susceptible(population_size) {
+	}
 
 	void populate() {
 		Circle circle;
@@ -35,7 +36,7 @@ public:
 			circle.direction.y = gen_random_float_number(-1.0f, 1.0f);
 			circle.center.x = gen_random_integer_number(coordinates_.top_left_corner.x, coordinates_.top_left_corner.x + coordinates_.width);
 			circle.center.y = gen_random_integer_number(coordinates_.top_left_corner.y, coordinates_.top_left_corner.y + coordinates_.height);
-			circle.home_cage = const_cast<char*>(name);
+			circle.home_cage = name;
 			circle.current_cage = circle.home_cage;
 			circles.push_back(circle);
 		}
@@ -164,10 +165,11 @@ public:
 		return coordinates_;
 	}
 
-	std::vector<std::list<Circle>::iterator> addDestination(char* destination_cage_name, int amount_of_circles) {
+	std::vector<std::list<Circle>::iterator> addDestination(std::string& destination_cage_name, int amount_of_circles) {
 		std::vector<std::list<Circle>::iterator> iterators;
 		auto circle_iterator = circles.begin();
 		while(circle_iterator != circles.end() && amount_of_circles-- > 0) {
+			if (!circle_iterator->destination_cage.empty()) continue;
 			circle_iterator->destination_cage = destination_cage_name;
 			circle_iterator->circle_moving_state = CircleMovingState::MOVING_TO_DESTINATION_CAGE;
 			iterators.emplace_back(circle_iterator);

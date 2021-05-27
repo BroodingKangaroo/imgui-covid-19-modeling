@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <string>
 
 #include "cage.h"
 #include "util.h"
@@ -8,7 +9,7 @@
 class Canvas {
 	int number_of_cages_{};
 	Coordinates coordinates_;
-	std::unordered_map<const char*, Cage> cages;
+	std::unordered_map<std::string, Cage> cages;
 	GraphData graph_values_;
 public:
 	Canvas(glm::vec2 top_left_corner, int height, int width) : coordinates_(top_left_corner, height, width) {}
@@ -17,31 +18,31 @@ public:
 		cages[cage.name] = cage;
 	}
 
-	std::unordered_map<const char*, Cage>& getCages() {
+	std::unordered_map<std::string, Cage>& getCages() {
 		return cages;
 	}
 
-	Cage& operator[] (const char* name) {
-		return cages[name];
+	Cage& operator[] (std::string& name) {
+		return cages[std::string(name)];
 	}
 
 	void populate(const char* name) {
-		cages[name].populate();
+		cages[std::string(name)].populate();
 	}
 
 	void populateInfected(const char* name, int number_of_infected_to_populate, float time) {
-		cages[name].populateInfected(number_of_infected_to_populate, time);
+		cages[std::string(name)].populateInfected(number_of_infected_to_populate, time);
 	}
 
 	void update(float scaled_current_time) {
 		float susceptible_total = 0, infected_total = 0, recovered_total = 0, dead_total = 0;
-		for (auto& cage : cages) {
-			cage.second.update(scaled_current_time);
+		for (auto& [name, cage] : cages) {
+			cage.update(scaled_current_time);
 			if (SIMULATION_SPEED) {
-				susceptible_total += cage.second.susceptible;
-				infected_total += cage.second.infected;
-				recovered_total += cage.second.recovered;
-				dead_total += cage.second.dead;
+				susceptible_total += cage.susceptible;
+				infected_total += cage.infected;
+				recovered_total += cage.recovered;
+				dead_total += cage.dead;
 			}
 		}
 		if (SIMULATION_SPEED)
@@ -76,8 +77,8 @@ public:
 	}
 	
 	void drawCircles(ImDrawList* drawList) {
-		for (auto& entry : cages) {
-			for (Circle& circle : entry.second.getCircles()) {
+		for (auto& [name, cage] : cages) {
+			for (Circle& circle : cage.getCircles()) {
 				ImVec2 center = ImVec2(circle.center.x, circle.center.y);
 				ImColor color = switchColorByDiseaseStage(circle.disease_stage);
 				drawList->AddCircleFilled(center, circle.radius, color);
@@ -94,16 +95,16 @@ public:
 			drawList->AddText(
 				ImGui::GetFont(),
 				CAGE_FONT_SIZE,
-				ImVec2(left.x + cage_coordinates.width / 2. - CAGE_FONT_SIZE / 2. * std::strlen(cage.name) / 2., left.y - 25),
+				ImVec2(left.x + cage_coordinates.width / 2. - CAGE_FONT_SIZE / 2. * cage.name.length() / 2., left.y - 25),
 				CAGE_NAME_COLOR, 
-				cage.name
+				cage.name.c_str()
 			);
 		}
 	}
 
 	bool isCageNameRepeats(char* cage_name) {
 		for (auto& [name, cage] : cages) {
-			if (std::strcmp(name, cage_name) == 0) { // 0 means equal
+			if (name == std::string(cage_name)) {
 				return false;
 			}
 		}

@@ -25,7 +25,7 @@ public:
 	}
 
 	void update(const float& current_time) {
-		for (int i = 0; i < moving_circles.size(); i++) {
+		for (size_t i = 0; i < moving_circles.size(); i++) {
 			for (auto& [cage_name, cage] : canvas_->getCages()) {
 
 				// If true - circle is in the cage that is not its home cage and circle is not resting there.
@@ -38,7 +38,7 @@ public:
 					auto old_iterator = moving_circles[i];
 					moving_circles[i] = cage.addCircle(old_iterator);
 					(*canvas_)[moving_circles[i]->current_cage].removeCircle(old_iterator);
-					moving_circles[i]->current_cage = const_cast<char*>(cage_name);
+					moving_circles[i]->current_cage = cage_name;
 
 					if ( // circle has come to a destination cage
 						moving_circles[i]->circle_moving_state == CircleMovingState::MOVING_TO_DESTINATION_CAGE
@@ -79,15 +79,15 @@ public:
 		}
 	}
 
-	void addDestination(const char* home_cage_name, const char* destination_cage_name, int amount_of_circles) {
-		std::vector<std::list<Circle>::iterator> iterators = (*canvas_)[home_cage_name].addDestination(const_cast<char*>(destination_cage_name), amount_of_circles);
+	void addDestination(std::string home_cage_name, std::string destination_cage_name, int amount_of_circles) {
+		std::vector<std::list<Circle>::iterator> iterators = (*canvas_)[home_cage_name].addDestination(destination_cage_name, amount_of_circles);
 		for (auto& iterator : iterators) {
 			addMovingCircle(iterator);
 		}
 	}
 
 private:
-	glm::vec2 calculateCircleDirectionByCageName_(glm::vec2 circle_center, const char* cage_name) const {
+	glm::vec2 calculateCircleDirectionByCageName_(glm::vec2 circle_center, std::string& cage_name) const {
 		Coordinates cage_coordinates = (*canvas_)[cage_name].getCoordinates();
 		float cage_center_x = cage_coordinates.top_left_corner.x + cage_coordinates.width / 2. - circle_center.x;
 		float cage_center_y = cage_coordinates.top_left_corner.y + cage_coordinates.height / 2. - circle_center.y;
