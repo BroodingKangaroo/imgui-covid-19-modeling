@@ -1,21 +1,35 @@
 #pragma once
 
 #include <vector>
+#include <fstream>
 
 #include "cage.h"
 #include "circle.h"
 #include "canvas.h"
 #include "settings.h"
 
+
+struct Flow
+{
+	std::string source;
+	std::string destination;
+	int amount;
+
+	Flow() = default;
+	
+	Flow(std::string source_, std::string destination_, int amount_) : source(source_), destination(destination_), amount(amount_) {}
+};
+
 /**
  *	Control the behavior of circles that move between cages.
  *	Circle moves to a destination cage and hangs out there for the TIME_TO_REST_IN_CAGE.
- *	When the time runs out it goes back to home cage and rest there for the same time.
- *	The function also processes encounters with cages that might be on the way to destination cage.
+ *	When the time runs out circle goes back to home cage and rest there for the same time.
+ *	The class also processes encounters of circles with cages that might be on the their way to destination cage or home cage.
  **/
 class CageMediator {
 	Canvas* canvas_;
 	std::vector<std::list<Circle>::iterator> moving_circles;
+	std::vector<Flow>flows_;
 
 public:
 	CageMediator(Canvas* canvas) : canvas_(canvas) {}
@@ -79,10 +93,55 @@ public:
 		}
 	}
 
-	void addDestination(std::string home_cage_name, std::string destination_cage_name, int amount_of_circles) {
-		std::vector<std::list<Circle>::iterator> iterators = (*canvas_)[home_cage_name].addDestination(destination_cage_name, amount_of_circles);
+	void addDestination(Flow flow) {
+		flows_.push_back(Flow(flow.source, flow.destination, flow.amount));
+		std::vector<std::list<Circle>::iterator> iterators = (*canvas_)[flow.source].addDestination(flow.destination, flow.amount);
 		for (auto& iterator : iterators) {
 			addMovingCircle(iterator);
+		}
+	}
+
+	void save(std::string file_name = getCurrentDate()) const {
+		std::ofstream out(file_name, std::ios::out | std::ios::app);
+		out << canvas_->getCages().size() << "\n";
+		for (const auto& [name, cage] : canvas_->getCages()) {
+			out << name << "\n";
+			out << cage.getCoordinates().top_left_corner.x << " " << cage.getCoordinates().top_left_corner.y << " " << cage.getCoordinates().width << " " << cage.getCoordinates().height << "\n";
+			out << cage.getPopulationSize() << "\n";
+		}
+		out << flows_.size() << "\n";
+		for (const auto& flow : flows_) {
+			out << flow.source << " " << flow.destination << " " << flow.amount << "\n";
+		}
+		out.close();
+	}
+
+	void clearData() {
+		flows_.clear();
+		moving_circles.clear();
+		canvas_->clear_data();
+	}
+	
+	void load(const std::string& file_name) {
+		clearData();
+		std::ifstream in(file_name);
+		int cages_number;
+		in >> cages_number;
+		while(cages_number--) {
+			int population_size;
+			std::string cage_name;
+			Coordinates cage_coordinates;
+			in >> cage_name >> cage_coordinates.top_left_corner.x >> cage_coordinates.top_left_corner.y >> cage_coordinates.width >> cage_coordinates.height;
+			in >> population_size;
+			canvas_->addCage(Cage(population_size, cage_coordinates, cage_name));
+		}
+		int flows_size;
+		in >> flows_size;
+		while (flows_size--) {
+			Flow flow;
+			in >> flow.source >> flow.destination >> flow.amount;
+			flows_.push_back(flow);
+			addDestination(flow);
 		}
 	}
 

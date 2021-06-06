@@ -10,7 +10,7 @@ class Canvas {
 	int number_of_cages_{};
 	Coordinates coordinates_;
 	std::unordered_map<std::string, Cage> cages;
-	GraphData graph_values_;
+	GraphData graph_data_;
 public:
 	Canvas(glm::vec2 top_left_corner, int height, int width) : coordinates_(top_left_corner, height, width) {}
 
@@ -46,11 +46,11 @@ public:
 			}
 		}
 		if (SIMULATION_SPEED)
-			graph_values_.update(susceptible_total, infected_total, recovered_total, dead_total, scaled_current_time);
+			graph_data_.update(susceptible_total, infected_total, recovered_total, dead_total, scaled_current_time);
 	}
 
 	GraphData& getGraphData() {
-		return graph_values_;
+		return graph_data_;
 	}
 
 	bool isCoordinatesValid(int* left_corner, int* size) {
@@ -109,5 +109,11 @@ public:
 			}
 		}
 		return true;
+	}
+
+	void clear_data() {
+		cages.clear();
+		number_of_cages_ = 0;
+		graph_data_.clearGraphData();
 	}
 };

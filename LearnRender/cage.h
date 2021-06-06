@@ -22,9 +22,9 @@ public:
 
 	Cage() {}
 
-	Cage(int population_size, int height, int width, glm::vec2 top_left_corner, std::string name_) :
+	Cage(int population_size, Coordinates coordinates, std::string name_) :
 		population_size_(population_size),
-		coordinates_(top_left_corner, height, width),
+		coordinates_(coordinates),
 		name(name_),
 		susceptible(population_size) {
 	}
@@ -81,6 +81,10 @@ public:
 		return circles;
 	}
 
+	int getPopulationSize() const {
+		return population_size_;
+	}
+
 	void removeCircle(const std::list<Circle>::iterator& circle_iterator) {
 		circles.erase(circle_iterator);
 	}
@@ -118,7 +122,7 @@ public:
 		}
 	}
 
-	glm::vec2* outsideViewport_(const Circle& c) {
+	glm::vec2* outsideViewport_(const Circle& c) const {
 		if (c.center.x > coordinates_.top_left_corner.x + coordinates_.width)
 			return Intersection::RIGHT;
 		if (c.center.y > coordinates_.top_left_corner.y + coordinates_.height)
@@ -146,7 +150,7 @@ public:
 		}
 	}
 
-	bool surrounds(glm::vec2 center) {
+	bool surrounds(glm::vec2 center) const {
 		if (center.x > coordinates_.top_left_corner.x
 			&& center.x < coordinates_.top_left_corner.x + coordinates_.width
 			&& center.y > coordinates_.top_left_corner.y

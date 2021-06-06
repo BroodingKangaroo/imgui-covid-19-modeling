@@ -3,6 +3,10 @@
 #include <GLFW/glfw3.h>
 #include <glm/vec2.hpp>
 #include <implot.h>
+#include <vector>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
 
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -33,6 +37,7 @@ struct GraphData
 		recovered.clear();
 		dead.clear();
 		time.clear();
+		bool continue_drawing = true;
 	}
 
 	void drawData() {
@@ -82,8 +87,8 @@ struct Coordinates {
 	int height{};
 	int width{};
 
-	Coordinates(){}
-	
+	Coordinates() = default;
+
 	Coordinates(glm::vec<2, float, glm::defaultp> top_left_corner_, int height_, int width_) :
 		top_left_corner(top_left_corner_),
 		height(height_),
@@ -103,6 +108,15 @@ glm::vec2* Intersection::TOP = new glm::vec2(1, -1);
 glm::vec2* Intersection::RIGHT = new glm::vec2(-1, 1);
 glm::vec2* Intersection::BOTTOM = new glm::vec2(1, -1);
 glm::vec2* Intersection::NO_INTERSECTION = nullptr;
+
+std::string getCurrentDate() {
+	std::time_t current_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	struct tm newtime;
+	localtime_s(&newtime, &current_time);
+	std::ostringstream ss;
+	ss << newtime.tm_mday << "-" << newtime.tm_mon << "-" << newtime.tm_hour << "-" << newtime.tm_min << "-" << newtime.tm_sec;
+	return ss.str();
+}
 
 GLFWwindow* GLFWBeginRendering(const char* title) {
 	GLFWwindow* window;

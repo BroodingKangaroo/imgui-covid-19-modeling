@@ -24,6 +24,7 @@ public:
 				manageCageControls(scaled_current_time);
 				manageAddCageButton();
 				manageAddFlowButton();
+				manageSaveLoadButtons();
 			}
 			ImGui::End();
 		}
@@ -38,6 +39,12 @@ public:
 
 private:
 
+	void manageSaveLoadButtons() {
+		if (ImGui::Button("Save")) {
+			cage_mediator_->save();
+		}
+	}
+	
 	void manageAddFlowButton() {
 		if (ImGui::TreeNode("Add flow")) {
 			static char source_cage_name[128] = "";
@@ -55,7 +62,7 @@ private:
 					add_flow_state_ = UserInputMessage::DUPLICATED_NAME;
 				} else {
 					add_flow_state_ = UserInputMessage::SUCCESS;
-					cage_mediator_->addDestination(std::string(source_cage_name), std::string(destination_cage_name), number_of_moving_circles);
+					cage_mediator_->addDestination(Flow(std::string(source_cage_name), std::string(destination_cage_name), number_of_moving_circles));
 				}
 			}
 			chooseUserInputMessage(add_flow_state_);
@@ -70,7 +77,7 @@ private:
 					cage.repopulate();
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("Populated 1 infected")) {
+				if (ImGui::Button("Populate 1 infected")) {
 					cage.populateInfected(1, scaled_current_time);
 				}
 				ImGui::TreePop();
@@ -103,7 +110,7 @@ private:
 					add_cage_state_ = UserInputMessage::OVERLAPPING;
 				} else {
 					add_cage_state_ = UserInputMessage::SUCCESS;
-					canvas_->addCage(Cage(population_size, size[1], size[0], glm::vec2(left_corner[0], left_corner[1]), cage_name));
+					canvas_->addCage(Cage(population_size, Coordinates(glm::vec2(left_corner[0], left_corner[1]), size[1], size[0]), cage_name));
 				}
 			}
 
