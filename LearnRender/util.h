@@ -109,7 +109,7 @@ glm::vec2* Intersection::RIGHT = new glm::vec2(-1, 1);
 glm::vec2* Intersection::BOTTOM = new glm::vec2(1, -1);
 glm::vec2* Intersection::NO_INTERSECTION = nullptr;
 
-std::string getCurrentDate() {
+std::string getTimesStamp() {
 	std::time_t current_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	struct tm newtime;
 	localtime_s(&newtime, &current_time);

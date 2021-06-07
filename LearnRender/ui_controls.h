@@ -1,10 +1,12 @@
 #pragma once
 
+#include <map>
+
 #include "canvas.h"
 #include "cage_mediator.h"
 
 enum class UserInputMessage {
-	WRONG_POPULATION_SIZE, EMPTY_NAME, REPEATED_NAME, INVALID_COORDINATES, OVERLAPPING, SUCCESS, INITIAL, DUPLICATED_NAME, FLOW_BIGGER_THAN_CAPABILITY
+	WRONG_POPULATION_SIZE, EMPTY_NAME, REPEATED_NAME, INVALID_COORDINATES, OVERLAPPING, SUCCESS, INITIAL, DUPLICATED_NAME, FLOW_BIGGER_THAN_CAPABILITY, SAVE_CREATED
 };
 
 class UIControls {
@@ -12,7 +14,8 @@ class UIControls {
 	CageMediator* cage_mediator_;
 	inline static UserInputMessage add_cage_state_ = UserInputMessage::INITIAL;
 	inline static UserInputMessage add_flow_state_ = UserInputMessage::INITIAL;
-
+	inline static UserInputMessage save_ = UserInputMessage::INITIAL;
+	inline static std::string file_name_;
 public:
 
 	UIControls(Canvas& canvas, CageMediator& cage_mediator) : canvas_(&canvas), cage_mediator_(&cage_mediator) {}
@@ -51,8 +54,12 @@ private:
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
 		if (ImGui::Button("Save")) {
-			const std::string file_name = cage_mediator_->save(std::string(file_name_buffer));
-			ImGui::TextColored(GREEN_COLOR, ("Save was created in file \"" + file_name + "\"").c_str());
+			file_name_ = cage_mediator_->save(std::string(file_name_buffer));
+			save_ = UserInputMessage::SAVE_CREATED;
+		}
+
+		if (save_ == UserInputMessage::SAVE_CREATED) {
+			chooseUserInputMessage(save_, {{"file_name", file_name_}});
 		}
 	}
 
@@ -90,15 +97,20 @@ private:
 	}
 	
 	void manageCageControls(float scaled_current_time) {
+		static int population_to_infect = 1;
 		for (auto& [cage_name, cage] : canvas_->getCages()) {
 			if (ImGui::TreeNode(cage_name.c_str())) {
 				if (ImGui::Button("Repopulate")) {
 					cage.repopulate();
 				}
 				ImGui::SameLine();
-				if (ImGui::Button("Populate 1 infected")) {
-					cage.populateInfected(1, scaled_current_time);
+				
+				if (ImGui::Button("Populate infected")) {
+					cage.populateInfected(population_to_infect, scaled_current_time);
 				}
+				ImGui::PushItemWidth(100);
+				ImGui::InputInt("Input size of population to infect", &population_to_infect);
+				ImGui::PopItemWidth();
 				ImGui::TreePop();
 			}
 		}
@@ -139,7 +151,7 @@ private:
 		}
 	}
 
-	void chooseUserInputMessage(UserInputMessage& state) {
+	void chooseUserInputMessage(UserInputMessage& state, std::map<std::string, std::string> params = {}) {
 		switch (state) {
 		case UserInputMessage::INVALID_COORDINATES:
 			ImGui::TextColored(RED_COLOR, "Please check input parameters. \nCage must be inside ViewPort."); break;
@@ -153,6 +165,8 @@ private:
 			ImGui::TextColored(RED_COLOR, "Please check input parameters. \nCage with such name already exists."); break;
 		case UserInputMessage::DUPLICATED_NAME:
 			ImGui::TextColored(RED_COLOR, "Please check input parameters. \nNames of the cages should not be equal."); break;
+		case UserInputMessage::SAVE_CREATED:
+			ImGui::TextColored(GREEN_COLOR, ("Save was created in file \"" + params["file_name"] + "\"").c_str());
 		case UserInputMessage::SUCCESS:
 			ImGui::TextColored(GREEN_COLOR, "Done."); break;
 		case UserInputMessage::INITIAL: break; default: break;

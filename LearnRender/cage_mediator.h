@@ -103,7 +103,7 @@ public:
 	}
 
 	std::string save(std::string file_name = "") const {
-		file_name = file_name + getCurrentDate();
+		file_name = file_name + "-" + getTimesStamp();
 		std::filesystem::create_directory(DIRECTORY_FOR_SAVES);
 		std::ofstream out(DIRECTORY_FOR_SAVES + "/" + file_name, std::ios::out | std::ios::app);
 		
