@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <fstream>
+#include <filesystem>
 
 #include "cage.h"
 #include "circle.h"
@@ -101,8 +102,11 @@ public:
 		}
 	}
 
-	void save(std::string file_name = getCurrentDate()) const {
-		std::ofstream out(file_name, std::ios::out | std::ios::app);
+	std::string save(std::string file_name = "") const {
+		file_name = file_name + getCurrentDate();
+		std::filesystem::create_directory(DIRECTORY_FOR_SAVES);
+		std::ofstream out(DIRECTORY_FOR_SAVES + "/" + file_name, std::ios::out | std::ios::app);
+		
 		out << canvas_->getCages().size() << "\n";
 		for (const auto& [name, cage] : canvas_->getCages()) {
 			out << name << "\n";
@@ -114,6 +118,7 @@ public:
 			out << flow.source << " " << flow.destination << " " << flow.amount << "\n";
 		}
 		out.close();
+		return file_name;
 	}
 
 	void clearData() {
@@ -124,8 +129,9 @@ public:
 	
 	void load(const std::string& file_name) {
 		clearData();
+		SIMULATION_SPEED = 0;
 		std::ifstream in(file_name);
-		int cages_number;
+		int cages_number, flows_number;
 		in >> cages_number;
 		while(cages_number--) {
 			int population_size;
@@ -135,9 +141,13 @@ public:
 			in >> population_size;
 			canvas_->addCage(Cage(population_size, cage_coordinates, cage_name));
 		}
-		int flows_size;
-		in >> flows_size;
-		while (flows_size--) {
+		in >> flows_number;
+		if (flows_number) {
+			for (auto& [name, cage] : canvas_->getCages()) {
+				cage.repopulate();
+			}
+		}
+		while (flows_number--) {
 			Flow flow;
 			in >> flow.source >> flow.destination >> flow.amount;
 			flows_.push_back(flow);

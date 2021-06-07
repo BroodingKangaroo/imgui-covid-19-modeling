@@ -24,7 +24,12 @@ public:
 				manageCageControls(scaled_current_time);
 				manageAddCageButton();
 				manageAddFlowButton();
-				manageSaveLoadButtons();
+			}
+			if (ImGui::CollapsingHeader("Save configuration")) {
+				manageSaveButton();
+			}
+			if (ImGui::CollapsingHeader("Load configuration")) {
+				manageLoadButton();
 			}
 			ImGui::End();
 		}
@@ -39,9 +44,23 @@ public:
 
 private:
 
-	void manageSaveLoadButtons() {
+	void manageSaveButton() {
+		static char file_name_buffer[128] = "";
+		ImGui::PushItemWidth(100);
+		ImGui::InputText("Input file name", file_name_buffer, IM_ARRAYSIZE(file_name_buffer));
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
 		if (ImGui::Button("Save")) {
-			cage_mediator_->save();
+			const std::string file_name = cage_mediator_->save(std::string(file_name_buffer));
+			ImGui::TextColored(GREEN_COLOR, ("Save was created in file \"" + file_name + "\"").c_str());
+		}
+	}
+
+	void manageLoadButton() {
+		for (const auto& entry : std::filesystem::directory_iterator(DIRECTORY_FOR_SAVES)) {
+			if (ImGui::Button(entry.path().string().c_str())) {
+				cage_mediator_->load(entry.path().string());
+			}
 		}
 	}
 	

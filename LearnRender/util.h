@@ -37,7 +37,7 @@ struct GraphData
 		recovered.clear();
 		dead.clear();
 		time.clear();
-		bool continue_drawing = true;
+		continue_drawing = true;
 	}
 
 	void drawData() {

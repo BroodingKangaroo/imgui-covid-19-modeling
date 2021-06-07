@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "imgui.h"
 
 int VIEWPORT_WIDTH = 1680;
@@ -31,3 +33,5 @@ float INFECTION_PROBABILITY = 0.07;
 bool SHOW_DEMO_WINDOW = false;
 
 float TIME_TO_REST_IN_CAGE = 1000;
+
+std::string DIRECTORY_FOR_SAVES = "saves";
