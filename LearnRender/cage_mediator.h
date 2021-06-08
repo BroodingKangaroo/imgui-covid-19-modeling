@@ -76,9 +76,10 @@ public:
 			}
 
 			// if true - time to get out of the cage
+			float time_to_rest_in_cage = gen_random_float_number(TIME_TO_REST_IN_CAGE_MIN, TIME_TO_REST_IN_CAGE_MAX);
 			if (moving_circles[i]->circle_moving_state == CircleMovingState::RESTING
 				&& moving_circles[i]->arrived_in >= 0
-				&& current_time - moving_circles[i]->arrived_in >= TIME_TO_REST_IN_CAGE
+				&& current_time - moving_circles[i]->arrived_in >= time_to_rest_in_cage
 				) {
 				moving_circles[i]->arrived_in = -1;
 				moving_circles[i]->circle_moving_state =

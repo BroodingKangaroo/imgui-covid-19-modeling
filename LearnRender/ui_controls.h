@@ -124,7 +124,7 @@ private:
 			ImGui::PushItemWidth(100);
 			ImGui::InputText("Input cage name", cage_name, IM_ARRAYSIZE(cage_name));
 			ImGui::InputInt2("Input x and y coordinates of the left top corner", left_corner);
-			ImGui::InputInt("Input width and height", size);
+			ImGui::InputInt2("Input width and height", size);
 			ImGui::InputInt("Input population size", &population_size);
 			ImGui::PopItemWidth();
 			
